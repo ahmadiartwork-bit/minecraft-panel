@@ -10,3 +10,4 @@ usernamecache.json
 *.zip
 *.jar
 .env
+backend/.env

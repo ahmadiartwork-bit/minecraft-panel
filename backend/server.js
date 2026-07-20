@@ -18,7 +18,7 @@ const io = new Server(server, { cors: { origin: "*" } });
 app.use(cors());
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../panel')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -499,6 +499,79 @@ app.post('/api/schedule/cancel', async (req, res) => {
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
+});
+
+app.get('/api/server/version', (req, res) => {
+  res.json({ 
+    current: process.env.VERSION || '1.21.5',
+    type: process.env.TYPE || 'PAPER'
+  });
+});
+
+app.get('/api/server/versions', async (req, res) => {
+  try {
+    const https = require('https');
+    const url = 'https://papermc.io/api/v2/projects/paper';
+    
+    https.get(url, (response) => {
+      let data = '';
+      response.on('data', chunk => data += chunk);
+      response.on('end', () => {
+        try {
+          const json = JSON.parse(data);
+          const versions = json.versions || [];
+          res.json(versions.reverse());
+        } catch (e) {
+          res.json(['1.21.5', '1.21.4', '1.21.3', '1.21.2', '1.21.1', '1.20.6', '1.20.4', '1.20.2', '1.20.1', '1.19.4', '1.19.3', '1.18.2', '1.17.1', '1.16.5']);
+        }
+      });
+    }).on('error', () => {
+      res.json(['1.21.5', '1.21.4', '1.21.3', '1.21.2', '1.21.1', '1.20.6', '1.20.4', '1.20.2', '1.20.1', '1.19.4', '1.19.3', '1.18.2', '1.17.1', '1.16.5']);
+    });
+  } catch (err) {
+    res.json(['1.21.5', '1.21.4', '1.21.3', '1.21.2', '1.21.1', '1.20.6', '1.20.4', '1.20.2', '1.20.1', '1.19.4', '1.19.3', '1.18.2', '1.17.1', '1.16.5']);
+  }
+});
+
+app.post('/api/server/version', async (req, res) => {
+  const { version } = req.body;
+  if (!version) return res.status(400).json({ error: 'Version required' });
+  
+  try {
+    const envPath = path.join(__dirname, '../.env');
+    let envContent = '';
+    if (await fs.pathExists(envPath)) {
+      envContent = await fs.readFile(envPath, 'utf8');
+    }
+    
+    if (envContent.includes('VERSION=')) {
+      envContent = envContent.replace(/VERSION=.*/, `VERSION=${version}`);
+    } else {
+      envContent += `\nVERSION=${version}`;
+    }
+    
+    await fs.writeFile(envPath, envContent);
+    
+    res.json({ 
+      success: true, 
+      message: `Version changed to ${version}. Server will restart with new version.`,
+      version 
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get('/api/server/types', (req, res) => {
+  res.json([
+    { id: 'PAPER', name: 'Paper', description: 'بهینه و سریع' },
+    { id: 'SPIGOT', name: 'Spigot', description: 'پایدار و محبوب' },
+    { id: 'BUKKIT', name: 'Bukkit', description: 'کلاسیک' },
+    { id: 'FABRIC', name: 'Fabric', description: 'مدرن و سبک' },
+    { id: 'FORGE', name: 'Forge', description: 'برای مادها' },
+    { id: 'VANILLA', name: 'Vanilla', description: 'اصلی ماینکرفت' },
+    { id: 'PURPUR', name: 'Purpur', description: 'بهینه‌ترین' }
+  ]);
 });
 
 io.on('connection', (socket) => {
