@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل مدیریت سرور ماینکرفت</title>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="loginScreen" class="login-screen">
+        <div class="login-box">
+            <div class="login-logo">
+                <i class="fas fa-cube"></i>
+            </div>
+            <h1>پنل مدیریت ماینکرفت</h1>
+            <p>رمز عبور را وارد کنید</p>
+            <input type="password" id="loginPassword" placeholder="رمز عبور" onkeypress="if(event.key==='Enter')login()">
+            <button onclick="login()" class="btn btn-primary btn-full">
+                <i class="fas fa-sign-in-alt"></i> ورود
+            </button>
+            <p id="loginError" class="error-text"></p>
+        </div>
+    </div>
+
+    <div id="mainApp" class="main-app hidden">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-cube"></i>
+                <span>Minecraft Panel</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item active" data-page="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>داشبورد</span>
+                </li>
+                <li class="nav-item" data-page="players">
+                    <i class="fas fa-users"></i>
+                    <span>بازیکنان</span>
+                </li>
+                <li class="nav-item" data-page="console">
+                    <i class="fas fa-terminal"></i>
+                    <span>کنسول</span>
+                </li>
+                <li class="nav-item" data-page="plugins">
+                    <i class="fas fa-puzzle-piece"></i>
+                    <span>پلاگین‌ها</span>
+                </li>
+                <li class="nav-item" data-page="worlds">
+                    <i class="fas fa-globe-americas"></i>
+                    <span>جهان‌ها</span>
+                </li>
+                <li class="nav-item" data-page="backups">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <span>بکاپ‌ها</span>
+                </li>
+                <li class="nav-item" data-page="config">
+                    <i class="fas fa-cog"></i>
+                    <span>تنظیمات</span>
+                </li>
+                <li class="nav-item" data-page="scheduler">
+                    <i class="fas fa-clock"></i>
+                    <span>زمان‌بندی</span>
+                </li>
+                <li class="nav-item" data-page="logs">
+                    <i class="fas fa-file-alt"></i>
+                    <span>لاگ‌ها</span>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <button onclick="logout()" class="btn btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> خروج
+                </button>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="top-bar-right">
+                    <button class="btn-toggle-sidebar" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h2 id="pageTitle">داشبورد</h2>
+                </div>
+                <div class="top-bar-left">
+                    <div class="status-badge" id="serverStatusBadge">
+                        <span class="status-dot offline"></span>
+                        <span>آفلاین</span>
+                    </div>
+                    <div class="server-info">
+                        <span id="playerCountNav">0 بازیکن</span>
+                        <span id="tpsNav">TPS: --</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard -->
+            <div id="page-dashboard" class="page active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-green"><i class="fas fa-server"></i></div>
+                        <div class="stat-info">
+                            <h3 id="dashStatus">آفلاین</h3>
+                            <p>وضعیت سرور</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon bg-blue"><i class="fas fa-users"></i></div>
+                        <div class="stat-info">
+                            <h3 id="dashPlayers">0/20</h3>
+                            <p>بازیکنان</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon bg-yellow"><i class="fas fa-bolt"></i></div>
+                        <div class="stat-info">
+                            <h3 id="dashTps">20.0</h3>
+                            <p>TPS</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon bg-purple"><i class="fas fa-memory"></i></div>
+                        <div class="stat-info">
+                            <h3 id="dashMemory">0MB</h3>
+                            <p>حافظه</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon bg-orange"><i class="fas fa-clock"></i></div>
+                        <div class="stat-info">
+                            <h3 id="dashUptime">00:00:00</h3>
+                            <p>زمان فعالیت</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon bg-cyan"><i class="fas fa-globe"></i></div>
+                        <div class="stat-info">
+                            <h3 id="dashVersion">--</h3>
+                            <p>نسخه</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-gamepad"></i> کنترل سرور</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="control-buttons">
+                                <button onclick="serverAction('start')" class="btn btn-success">
+                                    <i class="fas fa-play"></i> شروع
+                                </button>
+                                <button onclick="serverAction('stop')" class="btn btn-danger">
+                                    <i class="fas fa-stop"></i> توقف
+                                </button>
+                                <button onclick="serverAction('restart')" class="btn btn-warning">
+                                    <i class="fas fa-redo"></i> ریستارت
+                                </button>
+                                <button onclick="serverAction('save-all')" class="btn btn-info">
+                                    <i class="fas fa-save"></i> ذخیره
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-bolt"></i> دستورات سریع</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="quick-commands">
+                                <button onclick="quickCmd('weather clear')" class="btn btn-outline">
+                                    <i class="fas fa-sun"></i> هوای آفتابی
+                                </button>
+                                <button onclick="quickCmd('weather rain')" class="btn btn-outline">
+                                    <i class="fas fa-cloud-rain"></i> باران
+                                </button>
+                                <button onclick="quickCmd('time set day')" class="btn btn-outline">
+                                    <i class="fas fa-sun"></i> روز
+                                </button>
+                                <button onclick="quickCmd('time set night')" class="btn btn-outline">
+                                    <i class="fas fa-moon"></i> شب
+                                </button>
+                                <button onclick="quickCmd('difficulty peaceful')" class="btn btn-outline">
+                                    <i class="fas fa-dove"></i> آرام
+                                </button>
+                                <button onclick="quickCmd('difficulty normal')" class="btn btn-outline">
+                                    <i class="fas fa-shield-alt"></i> عادی
+                                </button>
+                                <button onclick="quickCmd('difficulty hard')" class="btn btn-outline">
+                                    <i class="fas fa-skull-crossbones"></i> سخت
+                                </button>
+                                <button onclick="quickCmd('kill @a')" class="btn btn-outline btn-danger">
+                                    <i class="fas fa-skull"></i> کشتن همه
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-users"></i> بازیکنان آنلاین</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="dashPlayerList" class="player-grid"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Players Page -->
+            <div id="page-players" class="page">
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-users"></i> بازیکنان آنلاین</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="onlinePlayersList" class="player-list"></div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-user-shield"></i> اوپراتورها (OP)</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="opsList" class="player-list"></div>
+                            <div class="input-group">
+                                <input type="text" id="addOpInput" placeholder="نام بازیکن">
+                                <button onclick="addOp()" class="btn btn-primary">افزودن OP</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-list"></i> لیست سفید</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="whitelistContent" class="player-list"></div>
+                            <div class="input-group">
+                                <input type="text" id="addWhitelistInput" placeholder="نام بازیکن">
+                                <button onclick="addToWhitelist()" class="btn btn-primary">افزودن</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-ban"></i> لیست مسدودها</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="bansList" class="player-list"></div>
+                            <div class="input-group">
+                                <input type="text" id="addBanInput" placeholder="نام بازیکن">
+                                <input type="text" id="banReasonInput" placeholder="دلیل (اختیاری)">
+                                <button onclick="addBan()" class="btn btn-danger">مسدود کردن</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-user-cog"></i> مدیریت بازیکن</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="player-actions-grid">
+                            <div class="action-group">
+                                <label>نام بازیکن</label>
+                                <input type="text" id="targetPlayer" placeholder="نام بازیکن">
+                            </div>
+                            <div class="action-group">
+                                <label>عملیات</label>
+                                <div class="action-buttons">
+                                    <button onclick="playerAction('kick')" class="btn btn-warning">
+                                        <i class="fas fa-shoe-prints"></i> اخراج
+                                    </button>
+                                    <button onclick="playerAction('ban')" class="btn btn-danger">
+                                        <i class="fas fa-ban"></i> مسدود
+                                    </button>
+                                    <button onclick="playerAction('pardon')" class="btn btn-success">
+                                        <i class="fas fa-check"></i> رفع مسدودیت
+                                    </button>
+                                    <button onclick="playerAction('op')" class="btn btn-info">
+                                        <i class="fas fa-crown"></i> OP کردن
+                                    </button>
+                                    <button onclick="playerAction('deop')" class="btn btn-secondary">
+                                        <i class="fas fa-user-minus"></i> حذف OP
+                                    </button>
+                                    <button onclick="playerAction('gamemode survival')" class="btn btn-outline">
+                                        <i class="fas fa-heart"></i> بقا
+                                    </button>
+                                    <button onclick="playerAction('gamemode creative')" class="btn btn-outline">
+                                        <i class="fas fa-lightbulb"></i> خلاقیت
+                                    </button>
+                                    <button onclick="playerAction('gamemode adventure')" class="btn btn-outline">
+                                        <i class="fas fa-compass"></i> ماجراجویی
+                                    </button>
+                                    <button onclick="playerAction('gamemode spectator')" class="btn btn-outline">
+                                        <i class="fas fa-eye"></i> تماشاگر
+                                    </button>
+                                    <button onclick="playerAction('tp')" class="btn btn-primary">
+                                        <i class="fas fa-exchange-alt"></i> تلپورت
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Console Page -->
+            <div id="page-console" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-terminal"></i> کنسول سرور</h3>
+                        <div class="header-actions">
+                            <button onclick="clearConsole()" class="btn btn-sm btn-outline">
+                                <i class="fas fa-trash"></i> پاک کردن
+                            </button>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="autoScroll" checked> اسکرول خودکار
+                            </label>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="consoleOutput" class="console-output"></div>
+                        <div class="console-input-group">
+                            <input type="text" id="consoleInput" placeholder="دستور را وارد کنید..." onkeypress="if(event.key==='Enter')sendConsoleCommand()">
+                            <button onclick="sendConsoleCommand()" class="btn btn-primary">
+                                <i class="fas fa-paper-plane"></i> اجرا
+                            </button>
+                        </div>
+                        <div class="console-presets">
+                            <button onclick="presetCmd('list')" class="btn btn-sm btn-outline">لیست بازیکنان</button>
+                            <button onclick="presetCmd('tps')" class="btn btn-sm btn-outline">TPS</button>
+                            <button onclick="presetCmd('save-all')" class="btn btn-sm btn-outline">ذخیره</button>
+                            <button onclick="presetCmd('gc')" class="btn btn-sm btn-outline">GC</button>
+                            <button onclick="presetCmd('say Server restarting in 5 minutes!')" class="btn btn-sm btn-outline">اعلان</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-history"></i> تاریخچه دستورات</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="commandHistory" class="command-history"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Plugins Page -->
+            <div id="page-plugins" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-puzzle-piece"></i> مدیریت پلاگین‌ها</h3>
+                        <button onclick="refreshPlugins()" class="btn btn-sm btn-primary">
+                            <i class="fas fa-sync"></i> بروزرسانی
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="pluginsList" class="plugins-grid"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Worlds Page -->
+            <div id="page-worlds" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-globe-americas"></i> مدیریت جهان‌ها</h3>
+                        <button onclick="refreshWorlds()" class="btn btn-sm btn-primary">
+                            <i class="fas fa-sync"></i> بروزرسانی
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="worldsList" class="worlds-grid"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Backups Page -->
+            <div id="page-backups" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-cloud-upload-alt"></i> مدیریت بکاپ‌ها</h3>
+                        <button onclick="createBackup()" class="btn btn-sm btn-success">
+                            <i class="fas fa-plus"></i> بکاپ جدید
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="backupsList" class="backups-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Config Page -->
+            <div id="page-config" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-cog"></i> تنظیمات سرور</h3>
+                        <button onclick="saveConfig()" class="btn btn-sm btn-success">
+                            <i class="fas fa-save"></i> ذخیره تنظیمات
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="configForm" class="config-form"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scheduler Page -->
+            <div id="page-scheduler" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-clock"></i> زمان‌بندی دستورات</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="scheduler-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>نام</label>
+                                    <input type="text" id="scheduleName" placeholder="نام زمان‌بندی">
+                                </div>
+                                <div class="form-group">
+                                    <label>Cron</label>
+                                    <input type="text" id="scheduleCron" placeholder="*/5 * * * *">
+                                </div>
+                                <div class="form-group">
+                                    <label>دستور</label>
+                                    <input type="text" id="scheduleCommand" placeholder="دستور ماینکرفت">
+                                </div>
+                                <div class="form-group">
+                                    <label>&nbsp;</label>
+                                    <button onclick="addSchedule()" class="btn btn-primary btn-full">
+                                        <i class="fas fa-plus"></i> افزودن
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="schedulesList" class="schedules-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logs Page -->
+            <div id="page-logs" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-file-alt"></i> لاگ‌های سرور</h3>
+                        <div class="header-actions">
+                            <button onclick="refreshLogs()" class="btn btn-sm btn-primary">
+                                <i class="fas fa-sync"></i> بروزرسانی
+                            </button>
+                            <button onclick="clearLogs()" class="btn btn-sm btn-outline">
+                                <i class="fas fa-trash"></i> پاک کردن
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="logsContent" class="logs-content"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+node_modules/
+*.log
+server.properties
+ops.json
+whitelist.json
+banned-players.json
+banned-ips.json
+usercache.json
+usernamecache.json
+*.zip
+*.jar
+.env

@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  minecraft:
+    build: .
+    ports:
+      - "25565:25565"
+      - "25575:25575"
+      - "5000:5000"
+    environment:
+      EULA: "TRUE"
+      TYPE: "PAPER"
+      VERSION: "1.21.5"
+      MEMORY: "2G"
+      DIFFICULTY: "normal"
+      GAMEMODE: "survival"
+      ONLINE_MODE: "TRUE"
+      MAX_PLAYERS: "20"
+      VIEW_DISTANCE: "10"
+      ENABLE_RCON: "true"
+      RCON_PORT: "25575"
+      RCON_PASSWORD: "minecraft123"
+      ENABLE_QUERY: "true"
+      QUERY_PORT: "25565"
+      PANEL_PASSWORD: "admin123"
+      MC_HOST: "localhost"
+      MC_RCON_PORT: "25575"
+      MC_RCON_PASSWORD: "minecraft123"
+      MC_SERVER_DIR: "/data"
+      NODE_ENV: "production"
+    volumes:
+      - minecraft-data:/data
+    restart: unless-stopped
+
+volumes:
+  minecraft-data:
