@@ -70,6 +70,10 @@ async function executeCommand(cmd) {
   return response;
 }
 
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', uptime: process.uptime() });
+});
+
 app.post('/api/auth', (req, res) => {
   const { password } = req.body;
   if (password === process.env.PANEL_PASSWORD) {
