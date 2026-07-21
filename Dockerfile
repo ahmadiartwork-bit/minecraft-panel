@@ -1,4 +1,4 @@
-FROM node:20-alpine AS panel
+FROM node:20-bookworm AS panel
 
 WORKDIR /opt/panel
 COPY backend/package*.json ./
@@ -31,7 +31,9 @@ ENV MC_SERVER_DIR=/data
 
 COPY --from=panel /opt/panel /opt/panel
 
-RUN apk add --no-cache nodejs npm curl jq
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs curl jq && \
+    rm -rf /var/lib/apt/lists/*
 
 EXPOSE 25565
 EXPOSE 25575
